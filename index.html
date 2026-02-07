@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INFEKSI-0</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <style>
+        /* Pengaturan Dasar */
+        * { box-sizing: border-box; } /* Penting agar padding tidak merusak lebar */
+
+        body {
+            background: #1a0f0f;
+            color: #e0d0c0;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center; /* Horisontal Center */
+            align-items: center;     /* Vertikal Center */
+            min-height: 100vh;       /* Gunakan min-height agar tidak terpotong di HP */
+            margin: 0;
+            text-align: center;
+            overflow-x: hidden;      /* Mencegah scroll menyamping */
+        }
+
+        /* --- LOADING SCREEN --- */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #1a0f0f;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-logo {
+            width: 120px;
+            filter: drop-shadow(0 0 8px #ff0000);
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        /* --- GAME CONTAINER --- */
+        .game-container {
+            background: rgba(0, 0, 0, 0.85);
+            border: 3px solid #631010;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #ff000033;
+            width: 90%;          /* Lebar dinamis untuk HP */
+            max-width: 400px;    /* Batas lebar maksimal di Desktop */
+            margin: 20px auto;   /* Jaga jarak aman di layar kecil */
+            position: relative;
+        }
+
+        /* Responsive Images */
+        .main-logo {
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 5px #ff0000);
+        }
+
+        .rulebook-img {
+            max-width: 100%;    /* Supaya tidak keluar dari kotak di HP */
+            height: auto;
+            border: 2px solid #631010;
+            margin: 15px auto;
+            display: block;
+            border-radius: 5px;
+        }
+
+        /* Game Mechanics UI */
+        .stats { font-size: 1.2rem; margin: 15px 0; font-weight: bold; }
+        .track {
+            background: #333;
+            height: 30px;
+            position: relative;
+            margin: 20px 0;
+            border-radius: 15px;
+            border: 1px solid #777;
+            overflow: hidden; /* Pastikan marker tidak keluar jalur */
+        }
+
+        #marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, #ff0000, #660000);
+            border-radius: 50%;
+            top: 0;
+            transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 10px #ff0000;
+        }
+
+        .labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #aaa; }
+        
+        button {
+            background: #631010;
+            color: white;
+            border: none;
+            padding: 15px 20px; /* Padding lebih besar agar mudah ditekan di HP */
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            font-family: inherit;
+            transition: 0.3s;
+            margin-bottom: 10px;
+            touch-action: manipulation; /* Optimasi klik di layar sentuh */
+        }
+
+        button:active { transform: scale(0.98); } /* Efek tekan di HP */
+        button:disabled { background: #333; opacity: 0.6; }
+        
+        #log { 
+            font-size: 0.9rem; 
+            color: #ffcccc; 
+            margin-top: 15px; 
+            height: 90px; 
+            overflow-y: auto; 
+            border-top: 1px solid #333; 
+            padding-top: 10px;
+            line-height: 1.4;
+        }
+
+        /* Animasi */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Sembunyikan Layar */
+        .screen { display: none; }
+        .active { display: flex; flex-direction: column; }
+
+        /* Media Query Khusus HP Sangat Kecil */
+        @media (max-height: 500px) {
+            .game-container { margin: 10px; padding: 10px; }
+            .main-logo { max-width: 150px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loading-screen">
+    <img src="logo.png" alt="Logo" class="loader-logo">
+    <div style="margin-top:20px; letter-spacing: 3px; color: #ff3333;">LOADING...</div>
+</div>
+
+<div class="game-container">
+    <div id="main-menu" class="screen active">
+        <img src="logo.png" alt="INFEKSI-0 Logo" class="main-logo">
+        <div style="margin-bottom: 20px; font-size: 0.75rem; color: #aaa; border-bottom: 1px solid #631010; padding-bottom: 15px;">
+            <div style="display: flex; justify-content: space-around;">
+                <span>👤 1 Player</span>
+                <span>🔞 13+</span>
+                <span>🕒 5m</span>
+            </div>
+        </div>
+        <button onclick="showScreen('game-screen')">PLAY GAME</button>
+        <button onclick="showScreen('rulebook-screen')">RULEBOOK</button>
+    </div>
+
+    <div id="rulebook-screen" class="screen">
+        <h2>PANDUAN</h2>
+        <img src="rulebook.png" alt="Rulebook" class="rulebook-img">
+        <p style="font-size: 0.8rem; color: #ccc;">Kalahkan infeksi sebelum mencapai angka 10.</p>
+        <button onclick="showScreen('main-menu')">KEMBALI</button>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <h1>INFEKSI-0</h1>
+        <div class="stats">Status: <span id="val">5</span></div>
+        
+        <div class="labels">
+            <span>MANUSIA (0)</span>
+            <span>INFEKSI (10)</span>
+        </div>
+        <div class="track">
+            <div id="marker" style="left: 50%;"></div>
+        </div>
+
+        <div id="turn-display" style="margin-bottom:10px;">Giliran: <strong>Manusia</strong></div>
+        <button id="rollBtn">LEMPAR DADU</button>
+        <div id="log">Siap bermain?</div>
+        <button style="background:#444; font-size:0.8rem;" onclick="location.reload()">RESTART</button>
+    </div>
+</div>
+
+<script>
+    // Penanganan Loading
+    window.addEventListener('load', () => {
+        const loader = document.getElementById('loading-screen');
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }, 1200);
+    });
+
+    let infection = 5;
+    let isPlayerTurn = true;
+    const marker = document.getElementById('marker');
+    const valDisplay = document.getElementById('val');
+    const log = document.getElementById('log');
+    const rollBtn = document.getElementById('rollBtn');
+    const turnDisplay = document.getElementById('turn-display');
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function updateUI() {
+        valDisplay.innerText = infection;
+        // Hitung posisi marker (0-10 dikonversi ke 0-90% agar tidak keluar jalur)
+        let position = (infection / 10) * 90; 
+        marker.style.left = position + "%";
+        
+        if (infection <= 0) {
+            log.innerHTML = "<h2 style='color:#00ff00'>MENANG!</h2>";
+            rollBtn.disabled = true;
+        } else if (infection >= 10) {
+            log.innerHTML = "<h2 style='color:#ff0000'>KALAH!</h2>";
+            rollBtn.disabled = true;
+        }
+    }
+
+    function calculateMove(dice) {
+        if (dice <= 3) return 0;
+        return dice - 3; // 4->1, 5->2, 6->3
+    }
+
+    async function playTurn() {
+        if (!isPlayerTurn) return;
+
+        rollBtn.disabled = true;
+        
+        // Giliran Pemain
+        const pDice = Math.floor(Math.random() * 6) + 1;
+        const pMove = calculateMove(pDice);
+        infection = Math.max(0, infection - pMove);
+        log.innerHTML = `Anda: 🎲 <b>${pDice}</b> (Mundur ${pMove})`;
+        updateUI();
+
+        if (infection <= 0) return;
+
+        // Giliran AI
+        isPlayerTurn = false;
+        turnDisplay.innerHTML = "Giliran: <span style='color:red'>Infeksi...</span>";
+        
+        setTimeout(() => {
+            const aiDice = Math.floor(Math.random() * 6) + 1;
+            const aiMove = calculateMove(aiDice);
+            infection = Math.min(10, infection + aiMove);
+            log.innerHTML += `<br>AI: 🎲 <b>${aiDice}</b> (Maju ${aiMove})`;
+            updateUI();
+            
+            if (infection < 10) {
+                isPlayerTurn = true;
+                rollBtn.disabled = false;
+                turnDisplay.innerHTML = "Giliran: <b>Manusia</b>";
+            }
+        }, 1000);
+    }
+
+    rollBtn.addEventListener('click', playTurn);
+</script>
+
+</body>
+</html>
