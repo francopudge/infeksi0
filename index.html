@@ -77,23 +77,24 @@
         .stats { font-size: 1.2rem; margin: 15px 0; font-weight: bold; }
         .track {
             background: #333;
-            height: 30px;
+            height: 20px; /* Diperkecil sedikit agar marker lebih menonjol */
             position: relative;
-            margin: 20px 0;
+            margin: 30px 0;
             border-radius: 15px;
             border: 1px solid #777;
-            overflow: hidden;
         }
 
+        /* PERUBAHAN DI SINI: Menggunakan Gambar Sebagai Penanda */
         #marker {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle, #ff0000, #660000);
-            border-radius: 50%;
-            top: 0;
+            width: 45px;
+            height: 45px;
+            background: url('penandainfeksi.png') no-repeat center center;
+            background-size: contain;
+            top: -12px; /* Mengatur posisi vertikal agar berada di tengah track */
             transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 10px #ff0000;
+            filter: drop-shadow(0 0 8px #ff0000);
+            z-index: 2;
         }
 
         .labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #aaa; }
@@ -161,7 +162,7 @@
             <div style="display: flex; justify-content: space-around;">
                 <span>👤 1 Player</span>
                 <span>🔞 13+</span>
-                <span>🕒 5m</span>
+                <span>🕒 5m-10m</span>
             </div>
         </div>
         <button onclick="showScreen('game-screen')">PLAY GAME</button>
@@ -189,7 +190,7 @@
             <span>INFEKSI (10)</span>
         </div>
         <div class="track">
-            <div id="marker" style="left: 50%;"></div>
+            <div id="marker"></div>
         </div>
 
         <div id="turn-display" style="margin-bottom:10px;">Giliran: <strong>Manusia</strong></div>
@@ -209,6 +210,7 @@
             loader.style.opacity = '0';
             setTimeout(() => loader.style.display = 'none', 500);
         }, 1200);
+        updateUI(); // Inisialisasi posisi awal marker
     });
 
     let infection = 5;
@@ -238,7 +240,8 @@
 
     function updateUI() {
         valDisplay.innerText = infection;
-        let position = (infection / 10) * 90; 
+        // Hitungan 88% digunakan agar gambar tidak keluar batas kanan track
+        let position = (infection / 10) * 88; 
         marker.style.left = position + "%";
         
         if (infection <= 0) {
