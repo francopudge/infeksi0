@@ -85,17 +85,15 @@
         }
 
         /* PERUBAHAN DI SINI: Menggunakan Gambar Sebagai Penanda */
-        #marker {
-            position: absolute;
-            width: 45px;
-            height: 45px;
-            background: url('penandainfeksi.png') no-repeat center center;
-            background-size: contain;
-            top: -12px; /* Mengatur posisi vertikal agar berada di tengah track */
-            transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            filter: drop-shadow(0 0 8px #ff0000);
-            z-index: 2;
-        }
+        #marker{
+    position:absolute;
+    width:30px;
+    height:30px;
+    background:url('penandainfeksi.png') no-repeat center center;
+    background-size:contain;
+    top:0px;
+    transition:left 0.4s;
+}
 
         .labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #aaa; }
         
@@ -144,6 +142,25 @@
             font-size: 0.7rem;
             margin-top: 10px;
         }
+
+        .number-board{
+    display:grid;
+    grid-template-columns: repeat(11,1fr);
+    gap:3px;
+    margin:20px 0;
+    position:relative;
+}
+
+.number-cell{
+    background:#222;
+    border:1px solid #631010;
+    padding:8px 0;
+    font-size:0.7rem;
+    border-radius:4px;
+}
+
+
+
     </style>
 </head>
 <body>
@@ -189,9 +206,9 @@
             <span>MANUSIA (0)</span>
             <span>INFEKSI (10)</span>
         </div>
-        <div class="track">
-            <div id="marker"></div>
-        </div>
+        <div class="number-board" id="board">
+    <div id="marker"></div>
+</div>
 
         <div id="turn-display" style="margin-bottom:10px;">Giliran: <strong>Manusia</strong></div>
         <button id="rollBtn">LEMPAR DADU</button>
@@ -203,96 +220,135 @@
 </div>
 
 <script>
-    // Penanganan Loading
-    window.addEventListener('load', () => {
-        const loader = document.getElementById('loading-screen');
-        setTimeout(() => {
-            loader.style.opacity = '0';
-            setTimeout(() => loader.style.display = 'none', 500);
-        }, 1200);
-        updateUI(); // Inisialisasi posisi awal marker
-    });
+let infection = 5;
+let isPlayerTurn = true;
 
-    let infection = 5;
-    let isPlayerTurn = true;
-    const marker = document.getElementById('marker');
-    const valDisplay = document.getElementById('val');
-    const log = document.getElementById('log');
-    const rollBtn = document.getElementById('rollBtn');
-    const turnDisplay = document.getElementById('turn-display');
-    const bgm = document.getElementById('bgm');
-    const musicBtn = document.getElementById('musicBtn');
+const marker = document.getElementById('marker');
+const valDisplay = document.getElementById('val');
+const log = document.getElementById('log');
+const rollBtn = document.getElementById('rollBtn');
+const turnDisplay = document.getElementById('turn-display');
+const bgm = document.getElementById('bgm');
+const musicBtn = document.getElementById('musicBtn');
+const board = document.getElementById('board');
 
-    function toggleMusic() {
-        if (bgm.paused) {
-            bgm.play();
-            musicBtn.innerText = "⏸ PAUSE MUSIC";
-        } else {
-            bgm.pause();
-            musicBtn.innerText = "🎵 PLAY MUSIC";
-        }
+/* =========================
+   BUAT PAPAN ANGKA 0–10
+========================= */
+for(let i = 0; i <= 10; i++){
+    const cell = document.createElement('div');
+    cell.className = 'number-cell';
+    cell.innerText = i;
+    board.appendChild(cell);
+}
+
+/* =========================
+   LOADING SCREEN
+========================= */
+window.addEventListener('load', () => {
+    const loader = document.getElementById('loading-screen');
+    setTimeout(() => {
+        loader.style.opacity = '0';
+        setTimeout(() => loader.style.display = 'none', 500);
+    }, 1200);
+
+    updateUI(); // ⬅️ sekarang AMAN
+});
+
+/* =========================
+   MUSIC
+========================= */
+function toggleMusic() {
+    if (bgm.paused) {
+        bgm.play();
+        musicBtn.innerText = "⏸ PAUSE MUSIC";
+    } else {
+        bgm.pause();
+        musicBtn.innerText = "🎵 PLAY MUSIC";
+    }
+}
+
+/* =========================
+   SCREEN SWITCH
+========================= */
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+
+    if(screenId === 'game-screen'){
+        setTimeout(updateUI, 50); // biar marker selalu pas
+    }
+}
+
+/* =========================
+   UPDATE UI
+========================= */
+function updateUI() {
+    valDisplay.innerText = infection;
+
+    const cells = document.querySelectorAll('.number-cell');
+    const targetCell = cells[infection];
+
+    if (targetCell) {
+        marker.style.left =
+            targetCell.offsetLeft +
+            (targetCell.offsetWidth / 2) -
+            (marker.offsetWidth / 2) + "px";
     }
 
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-
-    function updateUI() {
-        valDisplay.innerText = infection;
-        // Hitungan 88% digunakan agar gambar tidak keluar batas kanan track
-        let position = (infection / 10) * 88; 
-        marker.style.left = position + "%";
-        
-        if (infection <= 0) {
-            log.innerHTML = `<img src="cacingk.png" class="end-game-img" alt="MENANG"> <h2 style='color:#00ff00'>MENANG!</h2>`;
-            rollBtn.disabled = true;
-        } else if (infection >= 10) {
-            log.innerHTML = `<img src="cacingm.png" class="end-game-img" alt="KALAH"> <h2 style='color:#ff0000'>KALAH!</h2>`;
-            rollBtn.disabled = true;
-        }
-    }
-
-    function calculateMove(dice) {
-        if (dice <= 3) return 0;
-        return dice - 3;
-    }
-
-    async function playTurn() {
-        if (!isPlayerTurn) return;
-
+    if (infection <= 0) {
+        log.innerHTML = `<img src="cacingk.png" class="end-game-img"><h2 style="color:#00ff00">MENANG!</h2>`;
         rollBtn.disabled = true;
-        
-        // Giliran Pemain
-        const pDice = Math.floor(Math.random() * 6) + 1;
-        const pMove = calculateMove(pDice);
-        infection = Math.max(0, infection - pMove);
-        log.innerHTML = `Anda: 🎲 <b>${pDice}</b> (Mundur ${pMove})`;
+    } 
+    else if (infection >= 10) {
+        log.innerHTML = `<img src="cacingm.png" class="end-game-img"><h2 style="color:#ff0000">KALAH!</h2>`;
+        rollBtn.disabled = true;
+    }
+}
+
+/* =========================
+   GAME LOGIC
+========================= */
+function calculateMove(dice) {
+    return dice <= 3 ? 0 : dice - 3;
+}
+
+async function playTurn() {
+    if (!isPlayerTurn) return;
+
+    rollBtn.disabled = true;
+
+    const pDice = Math.floor(Math.random() * 6) + 1;
+    const pMove = calculateMove(pDice);
+    infection = Math.max(0, infection - pMove);
+
+    log.innerHTML = `Anda 🎲 <b>${pDice}</b> (Mundur ${pMove})`;
+    updateUI();
+
+    if (infection <= 0) return;
+
+    isPlayerTurn = false;
+    turnDisplay.innerHTML = "Giliran: <span style='color:red'>Infeksi</span>";
+
+    setTimeout(() => {
+        const aiDice = Math.floor(Math.random() * 6) + 1;
+        const aiMove = calculateMove(aiDice);
+        infection = Math.min(10, infection + aiMove);
+
+        log.innerHTML += `<br>Infeksi 🎲 <b>${aiDice}</b> (Maju ${aiMove})`;
         updateUI();
 
-        if (infection <= 0) return;
+        if (infection < 10) {
+            isPlayerTurn = true;
+            rollBtn.disabled = false;
+            turnDisplay.innerHTML = "Giliran: <b>Manusia</b>";
+        }
+    }, 1000);
+}
 
-        // Giliran AI
-        isPlayerTurn = false;
-        turnDisplay.innerHTML = "Giliran: <span style='color:red'>Infeksi...</span>";
-        
-        setTimeout(() => {
-            const aiDice = Math.floor(Math.random() * 6) + 1;
-            const aiMove = calculateMove(aiDice);
-            infection = Math.min(10, infection + aiMove);
-            log.innerHTML += `<br>AI: 🎲 <b>${aiDice}</b> (Maju ${aiMove})`;
-            updateUI();
-            
-            if (infection < 10) {
-                isPlayerTurn = true;
-                rollBtn.disabled = false;
-                turnDisplay.innerHTML = "Giliran: <b>Manusia</b>";
-            }
-        }, 1000);
-    }
-
-    rollBtn.addEventListener('click', playTurn);
+rollBtn.addEventListener('click', playTurn);
 </script>
+
 
 </body>
 </html>
