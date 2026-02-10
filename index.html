@@ -174,18 +174,19 @@
 
 <div class="game-container">
     <div id="main-menu" class="screen active">
-        <img src="logo.png" alt="INFEKSI-0 Logo" class="main-logo">
-        <div style="margin-bottom: 20px; font-size: 0.75rem; color: #aaa; border-bottom: 1px solid #631010; padding-bottom: 15px;">
-            <div style="display: flex; justify-content: space-around;">
-                <span>👤 1 Player</span>
-                <span>🔞 13+</span>
-                <span>🕒 5m-10m</span>
-            </div>
+    <img src="logo.png" alt="INFEKSI-0 Logo" class="main-logo">
+    <div style="margin-bottom: 20px; font-size: 0.75rem; color: #aaa; border-bottom: 1px solid #631010; padding-bottom: 15px;">
+        <div style="display: flex; justify-content: space-around;">
+            <span>👤 1 Player</span>
+            <span>🔞 13+</span>
+            <span>🕒 5m-10m</span>
         </div>
-        <button onclick="showScreen('game-screen')">PLAY GAME</button>
-        <button onclick="showScreen('rulebook-screen')">RULEBOOK</button>
     </div>
-
+    
+    <button onclick="showScreen('game-screen')">PLAY GAME</button>
+    <button onclick="showScreen('rulebook-screen')">RULEBOOK</button>
+    <button id="btnGame">KGAME</button>
+    </div>
     <div id="rulebook-screen" class="screen">
         <h2>PANDUAN</h2>
         <div style="margin: 15px 0;">
@@ -347,6 +348,14 @@ async function playTurn() {
 }
 
 rollBtn.addEventListener('click', playTurn);
+
+// Mengambil tombol berdasarkan ID
+const tombol = document.getElementById('btnGame');
+
+// Memberikan perintah klik
+tombol.onclick = function() {
+    window.location.href = 'https://francopudge.github.io/game/';
+};
 </script>
 
 
