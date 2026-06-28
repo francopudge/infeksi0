@@ -77,23 +77,22 @@
         .stats { font-size: 1.2rem; margin: 15px 0; font-weight: bold; }
         .track {
             background: #333;
-            height: 20px; /* Diperkecil sedikit agar marker lebih menonjol */
+            height: 20px;
             position: relative;
             margin: 30px 0;
             border-radius: 15px;
             border: 1px solid #777;
         }
 
-        /* PERUBAHAN DI SINI: Menggunakan Gambar Sebagai Penanda */
         #marker{
-    position:absolute;
-    width:30px;
-    height:30px;
-    background:url('penandainfeksi.png') no-repeat center center;
-    background-size:contain;
-    top:0px;
-    transition:left 0.4s;
-}
+            position:absolute;
+            width:30px;
+            height:30px;
+            background:url('penandainfeksi.png') no-repeat center center;
+            background-size:contain;
+            top:0px;
+            transition:left 0.4s;
+        }
 
         .labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #aaa; }
         
@@ -144,28 +143,25 @@
         }
 
         .number-board{
-    display:grid;
-    grid-template-columns: repeat(11,1fr);
-    gap:3px;
-    margin:20px 0;
-    position:relative;
-}
+            display:grid;
+            grid-template-columns: repeat(11,1fr);
+            gap:3px;
+            margin:20px 0;
+            position:relative;
+        }
 
-.number-cell{
-    background:#222;
-    border:1px solid #631010;
-    padding:8px 0;
-    font-size:0.7rem;
-    border-radius:4px;
-}
-
-
-
+        .number-cell{
+            background:#222;
+            border:1px solid #631010;
+            padding:8px 0;
+            font-size:0.7rem;
+            border-radius:4px;
+        }
     </style>
 </head>
 <body>
 
-<audio id="bgm" src="Shiki OP 1 [Blu-Ray].mp3" loop></audio>
+<audio id="bgm" src="Shiki OP 1 [Blu-Ray] .mp3" loop></audio>
 
 <div id="loading-screen">
     <img src="logo.png" alt="Logo" class="loader-logo">
@@ -174,19 +170,19 @@
 
 <div class="game-container">
     <div id="main-menu" class="screen active">
-    <img src="logo.png" alt="INFEKSI-0 Logo" class="main-logo">
-    <div style="margin-bottom: 20px; font-size: 0.75rem; color: #aaa; border-bottom: 1px solid #631010; padding-bottom: 15px;">
-        <div style="display: flex; justify-content: space-around;">
-            <span>👤 1 Player</span>
-            <span>🔞 13+</span>
-            <span>🕒 5m-10m</span>
+        <img src="logo.png" alt="INFEKSI-0 Logo" class="main-logo">
+        <div style="margin-bottom: 20px; font-size: 0.75rem; color: #aaa; border-bottom: 1px solid #631010; padding-bottom: 15px;">
+            <div style="display: flex; justify-content: space-around;">
+                <span>👤 1 Player</span>
+                <span>🔞 13+</span>
+                <span>🕒 5m-10m</span>
+            </div>
         </div>
+        
+        <button onclick="showScreen('game-screen')">PLAY GAME</button>
+        <button onclick="showScreen('rulebook-screen')">RULEBOOK</button>
     </div>
-    
-    <button onclick="showScreen('game-screen')">PLAY GAME</button>
-    <button onclick="showScreen('rulebook-screen')">RULEBOOK</button>
-    <button id="btnGame">KGAME</button>
-    </div>
+
     <div id="rulebook-screen" class="screen">
         <h2>PANDUAN</h2>
         <div style="margin: 15px 0;">
@@ -208,8 +204,8 @@
             <span>INFEKSI (10)</span>
         </div>
         <div class="number-board" id="board">
-    <div id="marker"></div>
-</div>
+            <div id="marker"></div>
+        </div>
 
         <div id="turn-display" style="margin-bottom:10px;">Giliran: <strong>Manusia</strong></div>
         <button id="rollBtn">LEMPAR DADU</button>
@@ -233,9 +229,6 @@ const bgm = document.getElementById('bgm');
 const musicBtn = document.getElementById('musicBtn');
 const board = document.getElementById('board');
 
-/* =========================
-   BUAT PAPAN ANGKA 0–10
-========================= */
 for(let i = 0; i <= 10; i++){
     const cell = document.createElement('div');
     cell.className = 'number-cell';
@@ -243,22 +236,15 @@ for(let i = 0; i <= 10; i++){
     board.appendChild(cell);
 }
 
-/* =========================
-   LOADING SCREEN
-========================= */
 window.addEventListener('load', () => {
     const loader = document.getElementById('loading-screen');
     setTimeout(() => {
         loader.style.opacity = '0';
         setTimeout(() => loader.style.display = 'none', 500);
     }, 1200);
-
-    updateUI(); // ⬅️ sekarang AMAN
+    updateUI();
 });
 
-/* =========================
-   MUSIC
-========================= */
 function toggleMusic() {
     if (bgm.paused) {
         bgm.play();
@@ -269,34 +255,21 @@ function toggleMusic() {
     }
 }
 
-/* =========================
-   SCREEN SWITCH
-========================= */
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
-
     if(screenId === 'game-screen'){
-        setTimeout(updateUI, 50); // biar marker selalu pas
+        setTimeout(updateUI, 50);
     }
 }
 
-/* =========================
-   UPDATE UI
-========================= */
 function updateUI() {
     valDisplay.innerText = infection;
-
     const cells = document.querySelectorAll('.number-cell');
     const targetCell = cells[infection];
-
     if (targetCell) {
-        marker.style.left =
-            targetCell.offsetLeft +
-            (targetCell.offsetWidth / 2) -
-            (marker.offsetWidth / 2) + "px";
+        marker.style.left = targetCell.offsetLeft + (targetCell.offsetWidth / 2) - (marker.offsetWidth / 2) + "px";
     }
-
     if (infection <= 0) {
         log.innerHTML = `<img src="cacingk.png" class="end-game-img"><h2 style="color:#00ff00">MENANG!</h2>`;
         rollBtn.disabled = true;
@@ -307,38 +280,27 @@ function updateUI() {
     }
 }
 
-/* =========================
-   GAME LOGIC
-========================= */
 function calculateMove(dice) {
     return dice <= 3 ? 0 : dice - 3;
 }
 
 async function playTurn() {
     if (!isPlayerTurn) return;
-
     rollBtn.disabled = true;
-
     const pDice = Math.floor(Math.random() * 6) + 1;
     const pMove = calculateMove(pDice);
     infection = Math.max(0, infection - pMove);
-
     log.innerHTML = `Anda 🎲 <b>${pDice}</b> (Mundur ${pMove})`;
     updateUI();
-
     if (infection <= 0) return;
-
     isPlayerTurn = false;
     turnDisplay.innerHTML = "Giliran: <span style='color:red'>Infeksi</span>";
-
     setTimeout(() => {
         const aiDice = Math.floor(Math.random() * 6) + 1;
         const aiMove = calculateMove(aiDice);
         infection = Math.min(10, infection + aiMove);
-
         log.innerHTML += `<br>Infeksi 🎲 <b>${aiDice}</b> (Maju ${aiMove})`;
         updateUI();
-
         if (infection < 10) {
             isPlayerTurn = true;
             rollBtn.disabled = false;
@@ -348,16 +310,7 @@ async function playTurn() {
 }
 
 rollBtn.addEventListener('click', playTurn);
-
-// Mengambil tombol berdasarkan ID
-const tombol = document.getElementById('btnGame');
-
-// Memberikan perintah klik
-tombol.onclick = function() {
-    window.location.href = 'https://francopudge.github.io/game/';
-};
 </script>
-
 
 </body>
 </html>
